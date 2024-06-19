@@ -1,23 +1,21 @@
-name: False Positive Cleanup
-on:
-  workflow_dispatch:
-  schedule:
-    - cron: '0 8 * * *'
-
-permissions: {}
 jobs:
   cleanup:
     permissions:
-      actions: write  #  to delete workflow runs
-
-    runs-on: ubuntu-latest
+      actions: write
+    runs-on: self-hosted
     steps:
-      - name: Delete workflow runs
-        uses: Mattraks/delete-workflow-runs@v2
-        with:
-          token: ${{ github.token }}
-          repository: ${{ github.repository }}
-          retain_days: 0
-          keep_minimum_runs: 0
-          delete_workflow_pattern: 'false-positive'
-          delete_run_by_conclusion_pattern: 'skipped'
+    - continue-on-error: true
+      name: Delete workflow runs
+      uses: Mattraks/delete-workflow-runs@v2
+      with:
+        delete_run_by_conclusion_pattern: skipped
+        delete_workflow_pattern: false-positive
+        keep_minimum_runs: 0
+        repository: ${{ github.repository }}
+        retain_days: 0
+        token: ${{ github.token }}
+name: False Positive Cleanup
+on:
+  repository_dispatch:
+    types: trigger-ga___false-positive-cleanup.yml
+permissions: {}
